@@ -70,7 +70,7 @@
         head = [doc createElement:@"head"];
         DOMNode *docElem = [doc documentElement];
         if ([docElem hasChildNodes]) {
-            [docElem insertBefore:head :[docElem firstChild]];
+            [docElem insertBefore:head refChild:[docElem firstChild]];
         } else {
             [docElem appendChild:head];
         }
@@ -81,7 +81,7 @@
     [metaTag setHttpEquiv:@"Content-Type"];
     [metaTag setContent:@"text/html; charset=UTF-8"];
     if ([head hasChildNodes]) {
-        [head insertBefore:metaTag :[head firstChild]];
+        [head insertBefore:metaTag refChild:[head firstChild]];
     } else {
         [head appendChild:metaTag];
     }
@@ -92,6 +92,7 @@
     [super windowControllerDidLoadNib:aController];
 
     [webView setEditable:YES];
+    [webView setEditingDelegate:self];
 
     WebFrame *frame = [webView mainFrame];
     if (source != nil) {
@@ -180,7 +181,7 @@
     if (_linkURLString) {
         DOMDocument *document = [[webView mainFrame] DOMDocument];
         DOMElement *anchor = [document createElement:@"a"];
-        [anchor setAttribute:@"href" :_linkURLString];
+        [anchor setAttribute:@"href" value:_linkURLString];
         [anchor appendChild:[document createTextNode:_linkURLString]];
         
         // FIXME: replaceSelectionWithNode doesn't work here because of: 
@@ -221,6 +222,11 @@
         // WebNavigationTypeReload and WebNavigationTypeFormResubmitted.
         [listener ignore];
     }
+}
+
+- (BOOL)webView:(WebView *)webView shouldShowDeleteInterfaceForElement:(DOMHTMLElement *)element
+{
+    return YES;
 }
 
 # pragma mark DEBUG
